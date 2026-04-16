@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mellone — Offer Letter Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="serverBanner" class="server-banner" hidden></div>
+
+  <header class="header">
+    <img src="assets/mellone_logo.png" alt="Mellone" class="header-logo" onerror="this.style.display='none'" />
+    <div>
+      <div class="header-title">Offer Letter Generator</div>
+      <div class="header-subtitle">Mellone · Newlogix Technologies Pvt Ltd · Internal HR Tool</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h1 class="card-title">Generate an Offer Letter</h1>
+      <p class="card-desc">Fill in the candidate details below. All fields are required. Click Preview to review, then Generate PDF to download.</p>
+
+      <form id="offerForm" method="post" enctype="multipart/form-data" novalidate>
+
+        <!-- CANDIDATE -->
+        <div class="form-section">
+          <div class="section-label">Candidate Details</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="candidateName">Candidate Name <span class="req">*</span></label>
+              <input type="text" id="candidateName" name="candidateName" placeholder="e.g. Priya Sharma" autocomplete="off" />
+              <span class="error-msg" id="err-candidateName">Please enter the candidate's name.</span>
+            </div>
+            <div class="field">
+              <label for="jobTitle">Job Title / Designation <span class="req">*</span></label>
+              <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g. Senior AI Consultant" autocomplete="off" />
+              <span class="error-msg" id="err-jobTitle">Please enter the job title.</span>
+            </div>
+            <div class="field">
+              <label for="department">Department <span class="req">*</span></label>
+              <input type="text" id="department" name="department" placeholder="e.g. Learning & Development" autocomplete="off" />
+              <span class="error-msg" id="err-department">Please enter the department.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTING MANAGER -->
+        <div class="form-section">
+          <div class="section-label">Reporting Manager</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="reportingManagerName">Manager Name <span class="req">*</span></label>
+              <input type="text" id="reportingManagerName" name="reportingManagerName" placeholder="e.g. Rakesh Venugopal" autocomplete="off" />
+              <span class="error-msg" id="err-reportingManagerName">Please enter the manager's name.</span>
+            </div>
+            <div class="field">
+              <label for="reportingManagerDesignation">Manager Designation <span class="req">*</span></label>
+              <input type="text" id="reportingManagerDesignation" name="reportingManagerDesignation" placeholder="e.g. Founder" autocomplete="off" />
+              <span class="error-msg" id="err-reportingManagerDesignation">Please enter the manager's designation.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OFFER TERMS -->
+        <div class="form-section">
+          <div class="section-label">Offer Terms</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="dateOfJoining">Date of Joining <span class="req">*</span></label>
+              <input type="date" id="dateOfJoining" name="dateOfJoining" />
+              <span class="error-msg" id="err-dateOfJoining">Please select a joining date.</span>
+            </div>
+            <div class="field">
+              <label for="totalCTC">Total CTC — Annual <span class="req">*</span></label>
+              <input type="text" id="totalCTC" name="totalCTC" placeholder="e.g. 18,00,000" autocomplete="off" />
+              <span class="error-msg" id="err-totalCTC">Please enter the total CTC.</span>
+            </div>
+            <div class="field">
+              <label for="offerDate">Offer Date <span class="req">*</span></label>
+              <input type="date" id="offerDate" name="offerDate" />
+              <span class="error-msg" id="err-offerDate">Please select the offer date.</span>
+            </div>
+            <div class="field">
+              <label for="acceptanceDeadline">Offer Acceptance Deadline <span class="req">*</span></label>
+              <input type="date" id="acceptanceDeadline" name="acceptanceDeadline" />
+              <span class="field-hint">Auto-set to offer date + 2 days. You can adjust.</span>
+              <span class="error-msg" id="err-acceptanceDeadline">Please select an acceptance deadline.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-preview" id="previewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Preview</span>
+          </button>
+          <button type="submit" class="btn-generate" id="generateBtn">
+            <div class="spinner"></div>
+            <span class="btn-text">Generate PDF</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const form       = document.getElementById('offerForm');
+    const btn        = document.getElementById('generateBtn');
+    const previewBtn = document.getElementById('previewBtn');
+    const toast      = document.getElementById('toast');
+    const banner     = document.getElementById('serverBanner');
+
+    const requiredFields = [
+      'candidateName', 'jobTitle', 'department',
+      'reportingManagerName', 'reportingManagerDesignation',
+      'dateOfJoining', 'totalCTC', 'offerDate', 'acceptanceDeadline',
+    ];
+
+    // ── Detect file:// vs http:// ─────────────────────────────────────────────
+    if (window.location.protocol === 'file:') {
+      banner.hidden = false;
+      banner.innerHTML = '<strong>Wrong URL.</strong> Open this via the server, not as a file. ' +
+        'Run <code>node server.js</code> in the <code>offer-letter-tool</code> folder, then visit ' +
+        '<a href="http://localhost:3000" target="_blank">http://localhost:3000</a>.';
+    } else {
+      fetch('/health').then(r => { if (r.ok) banner.hidden = true; }).catch(() => {
+        banner.hidden = false;
+        banner.textContent = 'Server not running — run node server.js then refresh.';
+      });
+    }
+
+    // ── Auto-populate acceptance deadline = offer date + 2 days ──────────────
+    document.getElementById('offerDate').addEventListener('change', function () {
+      const deadline = document.getElementById('acceptanceDeadline');
+      if (this.value) {
+        const d = new Date(this.value);
+        d.setDate(d.getDate() + 2);
+        deadline.value = d.toISOString().split('T')[0];
+        deadline.classList.remove('error');
+        document.getElementById('err-acceptanceDeadline').classList.remove('visible');
+      }
+    });
+
+    // ── Toast ────────────────────────────────────────────────────────────────
+    function showToast(msg, isError = false, duration = 5000) {
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error-toast' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ── Validation ───────────────────────────────────────────────────────────
+    function validate() {
+      let valid = true;
+      requiredFields.forEach(id => {
+        const input = document.getElementById(id);
+        const err   = document.getElementById('err-' + id);
+        if (!input.value.trim()) {
+          input.classList.add('error');
+          err.classList.add('visible');
+          valid = false;
+        } else {
+          input.classList.remove('error');
+          err.classList.remove('visible');
+        }
+      });
+      if (!valid) {
+        document.querySelector('input.error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return valid;
+    }
+
+    requiredFields.forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        document.getElementById(id).classList.remove('error');
+        document.getElementById('err-' + id).classList.remove('visible');
+      });
+    });
+
+    // ── Preview — native form POST to _blank (never blocked by popup blockers) ─
+    previewBtn.addEventListener('click', () => {
+      if (!validate()) { showToast('Fill in all required fields first.', true); return; }
+      form.action = '/preview';
+      form.target = '_blank';
+      form.submit();
+      form.action = '';
+      form.target = '';
+    });
+
+    // ── Generate PDF ──────────────────────────────────────────────────────────
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) { showToast('Fill in all required fields.', true); return; }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('/generate-pdf', { method: 'POST', body: formData });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || `Server error (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        const name = document.getElementById('candidateName').value.trim().replace(/\s+/g, '_');
+        const doj  = document.getElementById('dateOfJoining').value;
+        const [y, m, d] = doj.split('-');
+        const filename = `Offer_Letter_${name}_${d}${m}${y}.pdf`;
+
+        const url = URL.createObjectURL(blob);
+        const a   = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        showToast('Offer letter downloaded!');
+      } catch (err) {
+        const isNet = err.message.includes('fetch') || err.message.includes('Failed');
+        showToast(isNet ? 'Cannot reach server. Is node server.js running?' : 'Error: ' + err.message, true, 8000);
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

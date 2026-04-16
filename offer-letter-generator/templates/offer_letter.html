@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --deep-blue:  #1A1AE6;
+      --mid-blue:   #3333CC;
+      --dark-navy:  #1C1C2E;
+      --mid-gray:   #4A4A6A;
+    }
+
+    body {
+      font-family: 'Sora', Arial, sans-serif;
+      font-size: 9.5pt;
+      color: var(--dark-navy);
+      background: #fff;
+      line-height: 1.65;
+    }
+
+    /* ── Letterhead ── */
+    .letterhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .lh-left .company-name {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      margin-bottom: 3px;
+    }
+
+    .lh-left .company-meta {
+      font-size: 7.5pt;
+      color: var(--mid-gray);
+      line-height: 1.6;
+    }
+
+    .lh-right img.logo {
+      height: 44px;
+      width: auto;
+    }
+
+    .lh-rule {
+      border: none;
+      border-top: 2px solid var(--deep-blue);
+      margin: 8px 0 20px;
+    }
+
+    /* ── Date ── */
+    .offer-date {
+      font-size: 9pt;
+      font-style: italic;
+      color: var(--mid-gray);
+      margin-bottom: 22px;
+    }
+
+    /* ── Salutation ── */
+    .salutation {
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--dark-navy);
+      margin-bottom: 4px;
+    }
+
+    /* ── Main heading ── */
+    .offer-heading {
+      font-size: 13pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      margin-bottom: 14px;
+    }
+
+    /* ── Body text ── */
+    p.body {
+      font-size: 9.5pt;
+      line-height: 1.7;
+      text-align: justify;
+      margin-bottom: 14px;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1.5px solid var(--deep-blue);
+      padding-bottom: 3px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Role details definition list ── */
+    .role-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+
+    .role-table td {
+      font-size: 9.5pt;
+      padding: 4px 0;
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .role-table td.role-label {
+      font-weight: 700;
+      color: var(--dark-navy);
+      width: 34%;
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    .role-table td.role-value {
+      color: var(--dark-navy);
+    }
+
+    /* ── Bullet lists ── */
+    ul.clause-list {
+      padding-left: 20px;
+      margin-bottom: 14px;
+    }
+
+    ul.clause-list li {
+      font-size: 9.5pt;
+      line-height: 1.65;
+      margin-bottom: 6px;
+      text-align: justify;
+    }
+
+    /* ── Closing block ── */
+    .closing-block {
+      margin-top: 20px;
+    }
+
+    .closing-block p {
+      font-size: 9.5pt;
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+
+    .founder-name {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    .founder-meta {
+      font-size: 8.5pt;
+      color: var(--mid-gray);
+      line-height: 1.55;
+    }
+
+    /* ── Signature page ── */
+    .sig-page {
+      page-break-before: always;
+    }
+
+    .sig-heading {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      margin-bottom: 8px;
+    }
+
+    .sig-intro {
+      font-size: 9.5pt;
+      color: var(--dark-navy);
+      margin-bottom: 28px;
+    }
+
+    .sig-columns {
+      display: flex;
+      gap: 40px;
+      margin-top: 8px;
+    }
+
+    .sig-col {
+      flex: 1;
+    }
+
+    .sig-col-label {
+      font-size: 9pt;
+      font-weight: 700;
+      color: var(--deep-blue);
+      margin-bottom: 4px;
+    }
+
+    .sig-col-sublabel {
+      font-size: 9pt;
+      color: var(--mid-gray);
+      margin-bottom: 24px;
+    }
+
+    .sig-line {
+      border-bottom: 1px solid var(--dark-navy);
+      height: 44px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .sig-image {
+      max-height: 60px;
+      width: auto;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .sig-name {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--dark-navy);
+      margin-bottom: 2px;
+    }
+
+    .sig-role {
+      font-size: 9pt;
+      color: var(--mid-gray);
+      margin-bottom: 14px;
+    }
+
+    .sig-date {
+      font-size: 9pt;
+      font-weight: 700;
+      color: var(--dark-navy);
+    }
+
+    .sig-date-line {
+      display: inline-block;
+      width: 140px;
+      border-bottom: 1px solid var(--dark-navy);
+      margin-left: 6px;
+      vertical-align: bottom;
+    }
+
+    /* ── Confidentiality footer ── */
+    .conf-footer {
+      margin-top: 40px;
+      padding-top: 10px;
+      border-top: 1px solid #D0D0E8;
+      font-size: 7pt;
+      color: var(--mid-gray);
+      text-align: center;
+      line-height: 1.5;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     PAGES 1 & 2 — Offer Letter Body
+     ══════════════════════════════════════════════ -->
+
+<!-- Letterhead -->
+<div class="letterhead">
+  <div class="lh-left">
+    <div class="company-name">Newlogix Technologies Pvt Ltd</div>
+    <div class="company-meta">
+      CIN: U62099KA2025PTC207430<br />
+      T7 Viola 1103, Salarpuria Sattva Cadenza,<br />
+      Kudlu Jn. Bommanahalli, Bangalore – 560068, Karnataka.<br />
+      www.mellone.ai &nbsp;│&nbsp; +91 81294 28742 &nbsp;│&nbsp; hi@mellone.ai
+    </div>
+  </div>
+  <div class="lh-right">
+    <img class="logo" src="{{MELLONE_LOGO_SRC}}" alt="Mellone" />
+  </div>
+</div>
+<hr class="lh-rule" />
+
+<!-- Date -->
+<div class="offer-date">Date: {{OFFER_DATE}}</div>
+
+<!-- Salutation & heading -->
+<div class="salutation">Dear {{CANDIDATE_NAME}},</div>
+<div class="offer-heading">Offer of Employment</div>
+
+<p class="body">
+  We are delighted to extend this offer of employment to you at Mellone (Newlogix Technologies Pvt Ltd). Following our recent conversations, we believe you will be a great addition to our team and help us transform the way people deploy AI in their work and organisations. This letter sets out the key terms of your employment with us.
+</p>
+
+<!-- ROLE DETAILS -->
+<div class="section-heading">Role Details</div>
+
+<table class="role-table">
+  <tr>
+    <td class="role-label">Designation:</td>
+    <td class="role-value">{{JOB_TITLE}}</td>
+  </tr>
+  <tr>
+    <td class="role-label">Department:</td>
+    <td class="role-value">{{DEPARTMENT}}</td>
+  </tr>
+  <tr>
+    <td class="role-label">Reporting to:</td>
+    <td class="role-value">{{REPORTING_MANAGER}}</td>
+  </tr>
+  <tr>
+    <td class="role-label">Date of Joining:</td>
+    <td class="role-value">{{DATE_OF_JOINING}}</td>
+  </tr>
+  <tr>
+    <td class="role-label">Work Location:</td>
+    <td class="role-value">Remote (until further notice). Office: T7 Viola 1103, Salarpuria Sattva Cadenza, Kudlu Jn. Bommanahalli, Bangalore – 560068, Karnataka.</td>
+  </tr>
+</table>
+
+<!-- COMPENSATION -->
+<div class="section-heading">Compensation</div>
+
+<p class="body">
+  Your Total Fixed Compensation (Cost to Company) will be INR {{TOTAL_CTC}} per annum.
+</p>
+
+<p class="body">
+  In addition, you will be eligible for Variable Pay over and above your fixed CTC, linked to overall company performance. Variable pay is discretionary, not guaranteed, and the applicable terms will be communicated to you separately.
+</p>
+
+<p class="body">
+  All payments are subject to applicable Tax Deduction at Source (TDS) and statutory deductions in accordance with prevailing law.
+</p>
+
+<!-- PROBATION -->
+<div class="section-heading">Probation</div>
+
+<p class="body">
+  You will be on probation for a period of three (3) months from your date of joining. During this period, either party may end the employment by providing one (1) month's written notice or payment in lieu thereof. Confirmation at the end of probation is subject to satisfactory performance.
+</p>
+
+<!-- NOTICE PERIOD -->
+<div class="section-heading">Notice Period</div>
+
+<p class="body">
+  Upon confirmation of your employment, either party may terminate this arrangement by providing one (1) month's written notice or payment in lieu thereof. Mellone reserves the right to waive the notice period at its discretion.
+</p>
+
+<!-- KEY EMPLOYMENT CONDITIONS -->
+<div class="section-heading">Key Employment Conditions</div>
+
+<p class="body">This offer is conditional upon the following:</p>
+
+<ul class="clause-list">
+  <li>Satisfactory completion of a background verification check, including your educational qualifications and prior employment history.</li>
+  <li>You confirm that you are not bound by any non-compete, non-solicit, or other restrictive covenant with a previous employer that would prevent or limit your employment with Mellone.</li>
+  <li>You agree to maintain strict confidentiality of all proprietary, business, and customer information belonging to the Company, both during and after your employment.</li>
+  <li>Working hours and days shall be as per Company policy, which will be communicated to you at the time of joining.</li>
+  <li>Full terms and conditions of your employment will be set out in a separate Employment Agreement, which you will be required to sign on your date of joining.</li>
+</ul>
+
+<!-- NON-COMPETE AND NON-SOLICITATION -->
+<div class="section-heading">Non-Compete and Non-Solicitation</div>
+
+<p class="body">For a period of six (6) months following the end of your employment, you agree not to:</p>
+
+<ul class="clause-list">
+  <li>Directly or indirectly engage with, or be employed by, any business that competes with Mellone's current or planned activities;</li>
+  <li>Solicit, recruit, or attempt to hire any employee or contractor of the Company; or</li>
+  <li>Approach any client, customer, or business partner of the Company for purposes that compete with Mellone's business.</li>
+</ul>
+
+<p class="body">
+  These restrictions are reasonable given your role and Mellone's current stage. Detailed terms will be included in your Employment Agreement.
+</p>
+
+<!-- ACCEPTANCE -->
+<div class="section-heading">Acceptance</div>
+
+<p class="body">
+  Please sign and return a copy of this letter by {{ACCEPTANCE_DEADLINE}} to confirm your acceptance. This offer will lapse if we do not receive your unconditional acceptance by that date.
+</p>
+
+<p class="body">
+  We look forward to having you on board and working together to make AI transformation accessible and practical for every professional we serve.
+</p>
+
+<!-- Closing -->
+<div class="closing-block">
+  <p>Warm regards,</p>
+  <div class="founder-name">Rakesh Venugopal</div>
+  <div class="founder-meta">
+    Co-Founder, CEO &nbsp;│&nbsp; Newlogix Technologies Pvt Ltd (Mellone)<br />
+    hi@mellone.ai &nbsp;│&nbsp; +91 81294 28742 &nbsp;│&nbsp; www.mellone.ai
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3 — Signature Page
+     ══════════════════════════════════════════════ -->
+<div class="sig-page">
+
+  <!-- Letterhead repeated -->
+  <div class="letterhead">
+    <div class="lh-left">
+      <div class="company-name">Newlogix Technologies Pvt Ltd</div>
+      <div class="company-meta">
+        CIN: U62099KA2025PTC207430<br />
+        T7 Viola 1103, Salarpuria Sattva Cadenza,<br />
+        Kudlu Jn. Bommanahalli, Bangalore – 560068, Karnataka.<br />
+        www.mellone.ai &nbsp;│&nbsp; +91 81294 28742 &nbsp;│&nbsp; hi@mellone.ai
+      </div>
+    </div>
+    <div class="lh-right">
+      <img class="logo" src="{{MELLONE_LOGO_SRC}}" alt="Mellone" />
+    </div>
+  </div>
+  <hr class="lh-rule" />
+
+  <div class="sig-heading">Signatures</div>
+  <p class="sig-intro">By signing below, both parties confirm acceptance of the terms set out in this Offer Letter.</p>
+
+  <div class="sig-columns">
+
+    <!-- Company (Left) -->
+    <div class="sig-col">
+      <div class="sig-col-label">For Newlogix Technologies Pvt Ltd</div>
+      <div class="sig-col-sublabel">(Mellone)</div>
+
+      {{FOUNDER_SIGNATURE_HTML}}
+
+      <div class="sig-name">Rakesh Venugopal</div>
+      <div class="sig-role">Co-Founder, CEO</div>
+
+      <div class="sig-date">Date: <span class="sig-date-line"></span></div>
+    </div>
+
+    <!-- Candidate (Right) -->
+    <div class="sig-col">
+      <div class="sig-col-label">Accepted by</div>
+      <div class="sig-col-sublabel">(Candidate)</div>
+
+      <div class="sig-line"></div>
+
+      <div class="sig-name">{{CANDIDATE_NAME}}</div>
+      <div class="sig-role">{{JOB_TITLE}}</div>
+
+      <div class="sig-date">Date: <span class="sig-date-line"></span></div>
+    </div>
+
+  </div><!-- /sig-columns -->
+
+  <div class="conf-footer">
+    This offer letter is private and confidential. Terms herein are superseded by the Employment Agreement signed on the date of joining. &nbsp;│&nbsp; CIN: U62099KA2025PTC207430
+  </div>
+
+</div><!-- /sig-page -->
+
+</body>
+</html>
