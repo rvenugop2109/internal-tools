@@ -200,52 +200,14 @@
       });
     });
 
-    // ── Preview — fetch HTML, show in overlay iframe ─────────────────────────
-    const previewOverlay    = document.getElementById('previewOverlay');
-    const previewIframe     = document.getElementById('previewIframe');
-    const closePreviewBtn   = document.getElementById('closePreviewBtn');
-    const previewGenerateBtn = document.getElementById('previewGenerateBtn');
-
-    function closePreview() {
-      previewOverlay.classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    closePreviewBtn.addEventListener('click', closePreview);
-
-    // Escape key closes preview
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !previewOverlay.classList.contains('hidden')) closePreview();
-    });
-
-    // Generate PDF from within the preview toolbar
-    previewGenerateBtn.addEventListener('click', () => {
-      closePreview();
-      // Trigger the main form submit (PDF generation)
-      btn.click();
-    });
-
-    previewBtn.addEventListener('click', async () => {
+    // ── Preview — native form POST to _blank (opens in new tab) ─────────────
+    previewBtn.addEventListener('click', () => {
       if (!validate()) { showToast('Fill in all required fields first.', true); return; }
-
-      previewBtn.disabled = true;
-      previewBtn.querySelector('span').textContent = 'Loading…';
-
-      try {
-        const formData = new FormData(form);
-        const response = await fetch('/preview', { method: 'POST', body: formData });
-        if (!response.ok) throw new Error(`Server error (${response.status})`);
-        const html = await response.text();
-
-        previewIframe.srcdoc = html;
-        previewOverlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-      } catch (err) {
-        showToast('Preview failed: ' + err.message, true, 6000);
-      } finally {
-        previewBtn.disabled = false;
-        previewBtn.querySelector('span').textContent = 'Preview';
-      }
+      form.action = '/preview';
+      form.target = '_blank';
+      form.submit();
+      form.action = '';
+      form.target = '';
     });
 
     // ── Generate PDF ──────────────────────────────────────────────────────────
