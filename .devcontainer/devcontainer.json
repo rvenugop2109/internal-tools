@@ -1,0 +1,26 @@
+{
+  "name": "Mellone Offer Letter Tool",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+
+  // Install Chrome dependencies needed by Puppeteer
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libgbm1 libasound2 && cd offer-letter-generator && npm install",
+
+  // Start the server every time the Codespace resumes
+  "postStartCommand": "cd offer-letter-generator && node server.js &",
+
+  // Forward port 3000 and make it public so the URL is shareable without login
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Offer Letter Generator",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}
