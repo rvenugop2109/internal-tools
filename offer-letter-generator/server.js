@@ -14,12 +14,25 @@ const templatePath  = path.join(__dirname, 'templates', 'offer_letter.html');
 const logoPath      = path.join(__dirname, 'public', 'assets', 'mellone_logo.png');
 const signaturePath = path.join(__dirname, 'public', 'assets', 'founder_signature.png');
 
-// ── Shared helpers ────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
+// DD/MM/YYYY from YYYY-MM-DD
 function fmt(dateStr) {
   if (!dateStr) return '';
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
+}
+
+// Indian number format: 1200000 → 12,00,000
+function formatIndianNumber(raw) {
+  const stripped = String(raw).replace(/[,\s]/g, '');
+  const n = parseInt(stripped, 10);
+  if (isNaN(n)) return raw; // pass through non-numeric input as-is
+  const s = n.toString();
+  if (s.length <= 3) return s;
+  const last3 = s.slice(-3);
+  const rest  = s.slice(0, -3);
+  return rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + last3;
 }
 
 function asDataUri(filePath, mime) {
@@ -48,23 +61,26 @@ function buildHtml(body) {
   const logoDataUri = asDataUri(logoPath, 'image/png');
   const sigDataUri  = asDataUri(signaturePath, 'image/png');
 
+  // In the signature area: show image if available, otherwise a blank underline
   const signatureHtml = sigDataUri
     ? `<img src="${sigDataUri}" alt="Founder Signature" class="sig-image" />`
-    : '<div class="sig-line"></div>';
+    : '<div class="sig-line-rule"></div>';
+
+  const formattedCTC = formatIndianNumber(totalCTC || '');
 
   let html = fs.readFileSync(templatePath, 'utf8');
 
   return html
-    .replace(/{{CANDIDATE_NAME}}/g,    candidateName || '')
-    .replace(/{{JOB_TITLE}}/g,         jobTitle || '')
-    .replace(/{{DEPARTMENT}}/g,        department || '')
-    .replace(/{{REPORTING_MANAGER}}/g, reportingManager)
-    .replace(/{{DATE_OF_JOINING}}/g,   fmt(dateOfJoining))
-    .replace(/{{TOTAL_CTC}}/g,         totalCTC || '')
-    .replace(/{{OFFER_DATE}}/g,        fmt(offerDate))
-    .replace(/{{ACCEPTANCE_DEADLINE}}/g, fmt(acceptanceDeadline))
-    .replace(/{{FOUNDER_SIGNATURE_HTML}}/g, signatureHtml)
-    .replace(/{{MELLONE_LOGO_SRC}}/g,  logoDataUri);
+    .replace(/{{CANDIDATE_NAME}}/g,          candidateName || '')
+    .replace(/{{JOB_TITLE}}/g,               jobTitle || '')
+    .replace(/{{DEPARTMENT}}/g,              department || '')
+    .replace(/{{REPORTING_MANAGER}}/g,       reportingManager)
+    .replace(/{{DATE_OF_JOINING}}/g,         fmt(dateOfJoining))
+    .replace(/{{TOTAL_CTC}}/g,               formattedCTC)
+    .replace(/{{OFFER_DATE}}/g,              fmt(offerDate))
+    .replace(/{{ACCEPTANCE_DEADLINE}}/g,     fmt(acceptanceDeadline))
+    .replace(/{{FOUNDER_SIGNATURE_HTML}}/g,  signatureHtml)
+    .replace(/{{MELLONE_LOGO_SRC}}/g,        logoDataUri);
 }
 
 function filenameDate(dateOfJoining) {
@@ -77,8 +93,7 @@ function filenameDate(dateOfJoining) {
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// Preview — returns rendered HTML for browser display
-// Uses upload.none() to parse multipart form data (no file fields anymore)
+// Preview — returns rendered HTML (screen mode, for iframe srcdoc)
 app.post('/preview', upload.none(), (req, res) => {
   try {
     const html = buildHtml(req.body);
@@ -90,7 +105,7 @@ app.post('/preview', upload.none(), (req, res) => {
   }
 });
 
-// Generate PDF
+// Generate PDF — Puppeteer in print mode for @media print styles
 app.post('/generate-pdf', upload.none(), async (req, res) => {
   let browser;
   try {
@@ -102,12 +117,13 @@ app.post('/generate-pdf', upload.none(), async (req, res) => {
     });
 
     const page = await browser.newPage();
+    await page.emulateMediaType('print');
     await page.setContent(html, { waitUntil: 'networkidle2', timeout: 60000 });
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '20mm', right: '12mm', bottom: '12mm', left: '12mm' },
+      margin: { top: '28mm', right: '12mm', bottom: '20mm', left: '12mm' },
       timeout: 60000,
     });
 

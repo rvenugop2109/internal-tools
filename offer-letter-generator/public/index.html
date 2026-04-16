@@ -109,6 +109,23 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- ── Preview Overlay ───────────────────────────────── -->
+  <div class="preview-overlay hidden" id="previewOverlay">
+    <div class="preview-toolbar">
+      <span class="preview-toolbar-title">Offer Letter Preview</span>
+      <div class="preview-toolbar-actions">
+        <button class="btn-close-preview" id="closePreviewBtn">✕ Close</button>
+        <button class="btn-preview-generate" id="previewGenerateBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Generate PDF
+        </button>
+      </div>
+    </div>
+    <div class="preview-iframe-wrap">
+      <iframe id="previewIframe" title="Offer Letter Preview"></iframe>
+    </div>
+  </div>
+
   <script>
     const form       = document.getElementById('offerForm');
     const btn        = document.getElementById('generateBtn');
@@ -183,14 +200,52 @@
       });
     });
 
-    // ── Preview — native form POST to _blank (never blocked by popup blockers) ─
-    previewBtn.addEventListener('click', () => {
+    // ── Preview — fetch HTML, show in overlay iframe ─────────────────────────
+    const previewOverlay    = document.getElementById('previewOverlay');
+    const previewIframe     = document.getElementById('previewIframe');
+    const closePreviewBtn   = document.getElementById('closePreviewBtn');
+    const previewGenerateBtn = document.getElementById('previewGenerateBtn');
+
+    function closePreview() {
+      previewOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    closePreviewBtn.addEventListener('click', closePreview);
+
+    // Escape key closes preview
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !previewOverlay.classList.contains('hidden')) closePreview();
+    });
+
+    // Generate PDF from within the preview toolbar
+    previewGenerateBtn.addEventListener('click', () => {
+      closePreview();
+      // Trigger the main form submit (PDF generation)
+      btn.click();
+    });
+
+    previewBtn.addEventListener('click', async () => {
       if (!validate()) { showToast('Fill in all required fields first.', true); return; }
-      form.action = '/preview';
-      form.target = '_blank';
-      form.submit();
-      form.action = '';
-      form.target = '';
+
+      previewBtn.disabled = true;
+      previewBtn.querySelector('span').textContent = 'Loading…';
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('/preview', { method: 'POST', body: formData });
+        if (!response.ok) throw new Error(`Server error (${response.status})`);
+        const html = await response.text();
+
+        previewIframe.srcdoc = html;
+        previewOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } catch (err) {
+        showToast('Preview failed: ' + err.message, true, 6000);
+      } finally {
+        previewBtn.disabled = false;
+        previewBtn.querySelector('span').textContent = 'Preview';
+      }
     });
 
     // ── Generate PDF ──────────────────────────────────────────────────────────
