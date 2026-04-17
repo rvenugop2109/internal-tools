@@ -349,13 +349,47 @@
 </head>
 <body>
 
-<!-- Generate PDF button — visible only in browser preview tab, hidden when printing -->
+<!-- Generate PDF button — visible only in browser preview tab, hidden in print/PDF -->
 <div class="dl-btn-wrap">
-  <button class="dl-btn" onclick="window.print()">
+  <button class="dl-btn" id="dlBtn" onclick="downloadPdf()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Generate PDF
+    <span id="dlBtnText">Generate PDF</span>
   </button>
 </div>
+
+<script>
+  const __data__ = {{RAW_FORM_DATA_JSON}};
+
+  async function downloadPdf() {
+    const btn = document.getElementById('dlBtn');
+    const txt = document.getElementById('dlBtnText');
+    btn.disabled = true;
+    txt.textContent = 'Generating…';
+    try {
+      const res = await fetch('/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(__data__)
+      });
+      if (!res.ok) throw new Error('Server error');
+      const blob = await res.blob();
+      const name = (__data__.candidateName || 'Candidate').replace(/\s+/g, '_');
+      const doj  = __data__.dateOfJoining || '';
+      const [y, m, d] = doj.split('-');
+      const filename = `Offer_Letter_${name}_${d || '00'}${m || '00'}${y || '0000'}.pdf`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      alert('PDF generation failed. Try the Generate PDF button on the main page.');
+    } finally {
+      btn.disabled = false;
+      txt.textContent = 'Generate PDF';
+    }
+  }
+</script>
 
 <!-- Fixed footer: only visible in print / Puppeteer PDF -->
 <div class="conf-footer-fixed">

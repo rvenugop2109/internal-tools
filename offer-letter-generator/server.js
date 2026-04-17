@@ -68,6 +68,19 @@ function buildHtml(body) {
 
   const formattedCTC = formatIndianNumber(totalCTC || '');
 
+  // Raw data embedded in preview HTML so the "Generate PDF" button can POST back
+  const rawDataJson = JSON.stringify({
+    candidateName:              candidateName || '',
+    jobTitle:                   jobTitle || '',
+    department:                 department || '',
+    reportingManagerName:       reportingManagerName || '',
+    reportingManagerDesignation: reportingManagerDesignation || '',
+    dateOfJoining:              dateOfJoining || '',
+    totalCTC:                   totalCTC || '',
+    offerDate:                  offerDate || '',
+    acceptanceDeadline:         acceptanceDeadline || '',
+  });
+
   let html = fs.readFileSync(templatePath, 'utf8');
 
   return html
@@ -80,7 +93,8 @@ function buildHtml(body) {
     .replace(/{{OFFER_DATE}}/g,              fmt(offerDate))
     .replace(/{{ACCEPTANCE_DEADLINE}}/g,     fmt(acceptanceDeadline))
     .replace(/{{FOUNDER_SIGNATURE_HTML}}/g,  signatureHtml)
-    .replace(/{{MELLONE_LOGO_SRC}}/g,        logoDataUri);
+    .replace(/{{MELLONE_LOGO_SRC}}/g,        logoDataUri)
+    .replace('{{RAW_FORM_DATA_JSON}}',        rawDataJson);
 }
 
 function filenameDate(dateOfJoining) {
