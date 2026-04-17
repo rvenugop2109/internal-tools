@@ -123,7 +123,7 @@ app.post('/generate-pdf', upload.none(), async (req, res) => {
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '28mm', right: '12mm', bottom: '20mm', left: '12mm' },
+      margin: { top: '12mm', right: '12mm', bottom: '20mm', left: '12mm' },
       timeout: 60000,
     });
 
