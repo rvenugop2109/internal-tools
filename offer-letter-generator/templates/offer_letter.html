@@ -52,30 +52,30 @@
       font-size: 9pt;
       font-style: italic;
       color: var(--mid-gray);
-      margin-top: 22pt;
-      margin-bottom: 18pt;
+      margin-top: 14pt;
+      margin-bottom: 14pt;
     }
 
     .offer-heading {
       font-size: 16pt;
       font-weight: 700;
       color: var(--deep-blue);
-      margin-bottom: 10pt;
+      margin-bottom: 8pt;
     }
 
     .salutation {
       font-size: 11pt;
       font-weight: 700;
       color: var(--dark-navy);
-      margin-bottom: 10pt;
+      margin-bottom: 8pt;
     }
 
     /* ── Body paragraphs ────────────────────────────── */
     p.body {
       font-size: 9.5pt;
-      line-height: 1.7;
+      line-height: 1.65;
       text-align: justify;
-      margin-bottom: 10pt;
+      margin-bottom: 8pt;
     }
 
     /* ── Section headings ───────────────────────────── */
@@ -87,8 +87,8 @@
       letter-spacing: 0.4px;
       border-bottom: 1.5px solid var(--mid-blue);
       padding-bottom: 3pt;
-      margin-top: 18pt;
-      margin-bottom: 10pt;
+      margin-top: 14pt;
+      margin-bottom: 8pt;
     }
 
     /* ── Role table ─────────────────────────────────── */
@@ -253,12 +253,43 @@
       padding-top: 5pt;
     }
 
+    /* ── Download button (screen only) ─────────────── */
+    .dl-btn-wrap { display: none; }
+
     /* ── SCREEN MODE (iframe preview) ───────────────── */
     @media screen {
       body {
         background: #D8D8D8;
         padding: 28px 0 48px;
       }
+
+      .dl-btn-wrap {
+        display: block;
+        position: fixed;
+        top: 16px;
+        right: 24px;
+        z-index: 200;
+      }
+
+      .dl-btn {
+        font-family: 'Sora', Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        background: #1A1AE6;
+        border: none;
+        border-radius: 8px;
+        padding: 11px 24px;
+        cursor: pointer;
+        box-shadow: 0 2px 14px rgba(26, 26, 230, 0.30);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.15s;
+      }
+
+      .dl-btn:hover { background: #3333CC; }
+    }
 
       .page {
         background: #fff;
@@ -317,6 +348,14 @@
   </style>
 </head>
 <body>
+
+<!-- Generate PDF button — visible only in browser preview tab, hidden when printing -->
+<div class="dl-btn-wrap">
+  <button class="dl-btn" onclick="window.print()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Generate PDF
+  </button>
+</div>
 
 <!-- Fixed footer: only visible in print / Puppeteer PDF -->
 <div class="conf-footer-fixed">
