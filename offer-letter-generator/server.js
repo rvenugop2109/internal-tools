@@ -131,8 +131,8 @@ app.post('/generate-pdf', upload.none(), async (req, res) => {
     });
 
     const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.emulateMediaType('print');
-    await page.setContent(html, { waitUntil: 'networkidle2', timeout: 60000 });
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
