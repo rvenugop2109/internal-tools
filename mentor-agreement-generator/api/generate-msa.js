@@ -10,12 +10,11 @@ const REQUIRED = [
   'invoice_processing_days', 'company_signatory_name', 'company_signatory_designation',
 ];
 
-module.exports = async (req, res) => {
+module.exports = (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  let browser;
   try {
     const formData = req.body;
 
@@ -25,44 +24,10 @@ module.exports = async (req, res) => {
     }
 
     const html = generateMSAHtml(formData);
-
-    const chromium = require('@sparticuz/chromium');
-    const puppeteer = require('puppeteer-core');
-
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-
-    const page = await browser.newPage();
-    await page.emulateMediaType('print');
-    // domcontentloaded avoids hanging on external resources (e.g. Google Fonts) in serverless
-    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    // Brief wait so any synchronous JS/CSS in the document settles before printing
-    await new Promise(r => setTimeout(r, 1000));
-
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-      timeout: 60000,
-    });
-
-    await browser.close();
-    browser = null;
-
-    const safeName = formData.mentor_name.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ /g, '_');
-    const filename = `Mellone_MSA_${safeName}_${formData.execution_date}.pdf`;
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-    res.send(pdfBuffer);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
   } catch (err) {
-    if (browser) await browser.close().catch(() => {});
     console.error('MSA generation error:', err);
-    res.status(500).json({ error: 'PDF generation failed: ' + err.message });
+    res.status(500).json({ error: 'Failed to generate MSA: ' + err.message });
   }
 };

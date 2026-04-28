@@ -161,6 +161,29 @@ function generateMSAHtml(fd) {
     line-height: 1.6;
   }
 
+  /* ── Print toolbar (screen only) ── */
+  #print-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #1A1AE6; color: #fff;
+    padding: 10px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Sora', Arial, sans-serif; font-size: 13px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  #print-bar button {
+    background: #fff; color: #1A1AE6; border: none; border-radius: 6px;
+    padding: 7px 20px; font-weight: 700; cursor: pointer; font-size: 13px;
+    font-family: 'Sora', Arial, sans-serif;
+  }
+  #print-bar button:hover { background: #f0f0ff; }
+  #print-spacer { height: 44px; }
+
+  /* ── Print: hide toolbar, suppress browser headers/footers ── */
+  @media print {
+    #print-bar, #print-spacer { display: none !important; }
+    @page { margin: 0; size: A4 portrait; }
+  }
+
   /* ── Page ── */
   .page {
     width: 210mm;
@@ -290,6 +313,12 @@ function generateMSAHtml(fd) {
 </style>
 </head>
 <body>
+
+<div id="print-bar">
+  <span>Mellone — Mentor Services Agreement &nbsp;·&nbsp; ${e(fd.mentor_name)} &nbsp;·&nbsp; ${execDate}</span>
+  <button onclick="window.print()">⬇&nbsp; Save as PDF</button>
+</div>
+<div id="print-spacer"></div>
 
 <!-- Fixed footer for PDF (visible in print only) -->
 <div class="conf-footer-fixed">
