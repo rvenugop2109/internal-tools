@@ -38,7 +38,10 @@ module.exports = async (req, res) => {
 
     const page = await browser.newPage();
     await page.emulateMediaType('print');
-    await page.setContent(html, { waitUntil: 'networkidle2', timeout: 60000 });
+    // domcontentloaded avoids hanging on external resources (e.g. Google Fonts) in serverless
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    // Brief wait so any synchronous JS/CSS in the document settles before printing
+    await new Promise(r => setTimeout(r, 1000));
 
     const pdfBuffer = await page.pdf({
       format: 'A4',

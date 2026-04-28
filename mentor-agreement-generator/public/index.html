@@ -1024,8 +1024,8 @@ async function doGenerate() {
 
     showToast('MSA generated and downloaded!');
   } catch (err) {
-    const isNet = err.message.toLowerCase().includes('fetch') || err.message.toLowerCase().includes('failed');
-    showToast(isNet ? 'Cannot reach server. Is node server/index.js running?' : 'Error: ' + err.message, true);
+    const isNet = err instanceof TypeError && err.message.toLowerCase().includes('fetch');
+    showToast(isNet ? 'Cannot reach server — check your connection.' : 'Error: ' + err.message, true);
   } finally {
     btn.classList.remove('loading');
     btn.disabled = false;
