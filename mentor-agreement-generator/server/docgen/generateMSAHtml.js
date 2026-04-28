@@ -52,6 +52,13 @@ function sub(num, content) {
   return `<div class="sub"><span class="sub-n">${e(num)}</span><span class="sub-t">${content}</span></div>`;
 }
 
+function fmtFee(val) {
+  const v = (val || '').toString().trim();
+  if (!v || v.toUpperCase() === 'N/A') return 'N/A';
+  const n = Number(v);
+  return isNaN(n) ? 'N/A' : n.toFixed(2);
+}
+
 function dataTable(headers, rows) {
   const ths = headers.map(h => `<th>${e(h)}</th>`).join('');
   const trs = rows.map((r, i) =>
@@ -559,9 +566,9 @@ function generateMSAHtml(fd) {
   ${dataTable(
     ['Service Category', `Rate (${currency})`, 'Unit'],
     [
-      ['Recorded Content Creation', Number(fd.fee_per_recorded_hour).toFixed(2),         'Per recorded hour'],
-      ['Live Session Delivery',     Number(fd.fee_per_live_session).toFixed(2),           'Per session'],
-      ['Content Creation / Review', Number(fd.fee_per_content_creation_hour).toFixed(2), 'Per hour'],
+      ['Recorded Content Creation', fmtFee(fd.fee_per_recorded_hour),         'Per recorded hour'],
+      ['Live Session Delivery',     fmtFee(fd.fee_per_live_session),           'Per session'],
+      ['Content Creation / Review', fmtFee(fd.fee_per_content_creation_hour), 'Per hour'],
     ]
   )}
 

@@ -477,21 +477,21 @@
       <div class="field-grid">
         <div class="field">
           <label for="fee_recorded">Fee per Recorded Hour <span class="req">*</span></label>
-          <input type="number" id="fee_recorded" placeholder="0.00" min="0" step="0.01"
+          <input type="text" id="fee_recorded" placeholder="e.g. 5000 or N/A"
                  oninput="updateFeeSummary()" />
-          <div class="errmsg" id="err-fee_recorded">Must be a positive number.</div>
+          <div class="errmsg" id="err-fee_recorded">Enter a positive number or N/A.</div>
         </div>
         <div class="field">
           <label for="fee_live">Fee per Live Session <span class="req">*</span></label>
-          <input type="number" id="fee_live" placeholder="0.00" min="0" step="0.01"
+          <input type="text" id="fee_live" placeholder="e.g. 8000 or N/A"
                  oninput="updateFeeSummary()" />
-          <div class="errmsg" id="err-fee_live">Must be a positive number.</div>
+          <div class="errmsg" id="err-fee_live">Enter a positive number or N/A.</div>
         </div>
         <div class="field">
           <label for="fee_content">Fee per Content Creation Hour <span class="req">*</span></label>
-          <input type="number" id="fee_content" placeholder="0.00" min="0" step="0.01"
+          <input type="text" id="fee_content" placeholder="e.g. 3000 or N/A"
                  oninput="updateFeeSummary()" />
-          <div class="errmsg" id="err-fee_content">Must be a positive number.</div>
+          <div class="errmsg" id="err-fee_content">Enter a positive number or N/A.</div>
         </div>
         <div class="field">
           <label for="invoice_days">Invoice Processing Days <span class="req">*</span></label>
@@ -691,16 +691,23 @@ function getCurrency() {
 }
 
 // ─── Fee summary ──────────────────────────────────────────────────────────────
+function feeDisplay(raw, currency) {
+  const v = (raw || '').trim();
+  if (!v) return '—';
+  if (v.toUpperCase() === 'N/A') return 'N/A';
+  const n = parseFloat(v);
+  return isNaN(n) || n <= 0 ? '—' : `${currency} ${n.toFixed(2)}`;
+}
 function updateFeeSummary() {
-  const c  = getCurrency();
-  const r  = parseFloat(document.getElementById('fee_recorded').value) || 0;
-  const l  = parseFloat(document.getElementById('fee_live').value) || 0;
-  const co = parseFloat(document.getElementById('fee_content').value) || 0;
-  const show = r > 0 || l > 0 || co > 0;
+  const c   = getCurrency();
+  const r   = document.getElementById('fee_recorded').value;
+  const l   = document.getElementById('fee_live').value;
+  const co  = document.getElementById('fee_content').value;
+  const show = r.trim() || l.trim() || co.trim();
   document.getElementById('fee-summary').style.display = show ? '' : 'none';
-  document.getElementById('sum-recorded').textContent = `${c} ${r.toFixed(2)}`;
-  document.getElementById('sum-live').textContent     = `${c} ${l.toFixed(2)}`;
-  document.getElementById('sum-content').textContent  = `${c} ${co.toFixed(2)}`;
+  document.getElementById('sum-recorded').textContent = feeDisplay(r,  c);
+  document.getElementById('sum-live').textContent     = feeDisplay(l,  c);
+  document.getElementById('sum-content').textContent  = feeDisplay(co, c);
 }
 
 // ─── Signatory preview ────────────────────────────────────────────────────────
@@ -803,16 +810,17 @@ function validateStep(n) {
       }
     }
 
-    const fr = parseFloat(document.getElementById('fee_recorded').value);
-    if (!fr || fr <= 0) { showErr('fee_recorded', 'fee_recorded'); errs.push('Fee per recorded hour must be a positive number.'); }
+    function validFee(v) { const t = (v||'').trim(); return t.toUpperCase() === 'N/A' || (parseFloat(t) > 0); }
+    const fr = document.getElementById('fee_recorded').value;
+    if (!validFee(fr)) { showErr('fee_recorded', 'fee_recorded'); errs.push('Fee per recorded hour: enter a number or N/A.'); }
     else clearErr('fee_recorded');
 
-    const fl = parseFloat(document.getElementById('fee_live').value);
-    if (!fl || fl <= 0) { showErr('fee_live', 'fee_live'); errs.push('Fee per live session must be a positive number.'); }
+    const fl = document.getElementById('fee_live').value;
+    if (!validFee(fl)) { showErr('fee_live', 'fee_live'); errs.push('Fee per live session: enter a number or N/A.'); }
     else clearErr('fee_live');
 
-    const fc = parseFloat(document.getElementById('fee_content').value);
-    if (!fc || fc <= 0) { showErr('fee_content', 'fee_content'); errs.push('Fee per content creation hour must be a positive number.'); }
+    const fc = document.getElementById('fee_content').value;
+    if (!validFee(fc)) { showErr('fee_content', 'fee_content'); errs.push('Fee per content creation hour: enter a number or N/A.'); }
     else clearErr('fee_content');
 
     const id = parseInt(document.getElementById('invoice_days').value);
@@ -932,9 +940,9 @@ function buildReview() {
   const id = document.getElementById('invoice_days').value;
   html += reviewSection('Commercial Terms', [
     reviewRow('Currency',                    currency,                                        m(currency === '—' ? '' : currency)),
-    reviewRow('Fee — Recorded Hour',         `${currency} ${parseFloat(fr||0).toFixed(2)}`,  m(fr)),
-    reviewRow('Fee — Live Session',          `${currency} ${parseFloat(fl||0).toFixed(2)}`,  m(fl)),
-    reviewRow('Fee — Content Creation Hour', `${currency} ${parseFloat(fc||0).toFixed(2)}`,  m(fc)),
+    reviewRow('Fee — Recorded Hour',         feeDisplay(fr,  currency),  m(fr)),
+    reviewRow('Fee — Live Session',          feeDisplay(fl,  currency),  m(fl)),
+    reviewRow('Fee — Content Creation Hour', feeDisplay(fc,  currency),  m(fc)),
     reviewRow('Invoice Processing',          `${id} days`,                                   m(id)),
   ].join(''));
 
