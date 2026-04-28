@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mellone — Mentor Agreement Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── CSS variables ── */
+    :root {
+      --deep-blue:  #1A1AE6;
+      --mid-blue:   #3333CC;
+      --periwinkle: #7B7BE8;
+      --pale-blue:  #A0A0F5;
+      --off-white:  #F4F4FB;
+      --dark-navy:  #1C1C2E;
+      --mid-gray:   #4A4A6A;
+      --red:        #E63946;
+      --light:      #E8E8F8;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--off-white);
+      color: var(--dark-navy);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Server warning banner ── */
+    .server-banner {
+      background: #FFF3CD;
+      border-bottom: 2px solid #E6AC00;
+      color: #5A4000;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 12px 24px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .server-banner a { color: #5A4000; font-weight: 700; text-decoration: underline; }
+    .server-banner code { background: rgba(0,0,0,.08); border-radius: 4px; padding: 1px 6px; font-family: monospace; font-size: 12px; }
+
+    /* ── Header ── */
+    .header {
+      background: #fff;
+      border-bottom: 3px solid var(--deep-blue);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-logo { height: 40px; width: auto; }
+    .header-title { font-size: 20px; font-weight: 700; color: var(--deep-blue); letter-spacing: 0.4px; }
+    .header-subtitle { font-size: 13px; color: var(--mid-gray); margin-top: 2px; }
+
+    /* ── Main container ── */
+    .container { max-width: 760px; margin: 40px auto 0; padding: 0 16px; }
+
+    /* ── Step indicator ── */
+    .steps {
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 0; margin-bottom: 24px; overflow-x: auto;
+    }
+    .step-item { display: flex; align-items: center; flex: 1; min-width: 0; }
+    .step-item:last-child { flex: none; }
+    .step-wrap { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+      border: 2px solid #D4D4EE; background: #fff; color: var(--mid-gray);
+      transition: all .2s;
+    }
+    .step-circle.done   { background: var(--deep-blue); border-color: var(--deep-blue); color: #fff; }
+    .step-circle.active { background: var(--deep-blue); border-color: var(--deep-blue); color: #fff; box-shadow: 0 0 0 4px rgba(160,160,245,.3); }
+    .step-connector { flex: 1; height: 2px; background: #D4D4EE; margin: 0 4px; margin-top: -17px; transition: background .2s; }
+    .step-connector.done { background: var(--deep-blue); }
+    .step-label { font-size: 10px; font-weight: 600; color: var(--mid-gray); text-align: center; margin-top: 5px; white-space: nowrap; }
+    .step-label.active { color: var(--deep-blue); }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 36px 40px;
+      box-shadow: 0 2px 16px rgba(26,26,230,.07);
+    }
+    .card-title { font-size: 18px; font-weight: 700; color: var(--deep-blue); margin-bottom: 6px; }
+    .card-desc  { font-size: 14px; color: var(--mid-gray); margin-bottom: 28px; line-height: 1.6; }
+
+    /* ── Step panels ── */
+    .step-panel { display: none; }
+    .step-panel.visible { display: block; }
+
+    /* ── Section label (like offer-letter) ── */
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--mid-blue);
+      border-bottom: 2px solid var(--pale-blue);
+      padding-bottom: 6px; margin-bottom: 18px;
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--dark-navy); margin-bottom: 6px;
+    }
+    .field label .req { color: var(--deep-blue); margin-left: 2px; }
+    .field input, .field textarea, .field select {
+      font-family: 'Sora', sans-serif;
+      width: 100%; border: 1.5px solid #D4D4EE; border-radius: 8px;
+      padding: 10px 14px; font-size: 14px;
+      color: var(--dark-navy); background: var(--off-white); outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--deep-blue); box-shadow: 0 0 0 3px rgba(26,26,230,.10); background: #fff;
+    }
+    .field input.err, .field textarea.err, .field select.err { border-color: var(--red); }
+    .field input:disabled { background: #EBEBF5; color: var(--mid-gray); cursor: not-allowed; }
+    .field textarea { resize: none; }
+    .field .hint  { font-size: 12px; color: var(--mid-gray); margin-top: 4px; }
+    .field .errmsg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+    .field .errmsg.show { display: block; }
+
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
+
+    /* ── Radio cards ── */
+    .radio-cards { display: flex; flex-direction: column; gap: 10px; }
+    .radio-card {
+      border: 1.5px solid #D4D4EE; border-radius: 10px; padding: 14px 16px;
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .radio-card:hover { border-color: var(--periwinkle); }
+    .radio-card.selected { border-color: var(--deep-blue); background: var(--off-white); }
+    .radio-card label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .radio-card input[type=radio] { width: 16px; height: 16px; accent-color: var(--deep-blue); flex-shrink: 0; }
+    .radio-card p { font-size: 11px; color: var(--mid-gray); margin-top: 4px; margin-left: 26px; }
+
+    /* ── Inline radio row ── */
+    .radio-row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 6px; }
+    .radio-row label { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; font-weight: 500; }
+    .radio-row input[type=radio] { width: 16px; height: 16px; accent-color: var(--deep-blue); }
+
+    /* ── Info banner ── */
+    .info-banner {
+      background: #EEEEFF; border: 1px solid var(--pale-blue); border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; color: var(--dark-navy); margin-bottom: 20px;
+    }
+
+    /* ── Fee summary ── */
+    .fee-summary {
+      background: var(--off-white); border: 1px solid var(--pale-blue); border-radius: 10px;
+      padding: 16px; margin-top: 4px;
+    }
+    .fee-summary-title { font-size: 10px; font-weight: 700; color: var(--deep-blue); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+    .fee-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid #E0E0F0; }
+    .fee-row:last-child { border-bottom: none; }
+    .fee-row .fee-label { color: var(--mid-gray); }
+    .fee-row .fee-val   { font-weight: 700; color: var(--dark-navy); }
+
+    /* ── Signatory preview ── */
+    .sig-preview {
+      background: var(--off-white); border: 1px solid #D4D4EE; border-radius: 10px;
+      padding: 16px; margin-top: 8px;
+    }
+    .sig-preview .sig-name { font-size: 15px; font-weight: 700; color: var(--dark-navy); }
+    .sig-preview .sig-role { font-size: 13px; color: var(--mid-gray); margin-top: 2px; }
+    .sig-preview .sig-co   { font-size: 12px; color: var(--mid-gray); margin-top: 2px; }
+
+    /* ── Review table ── */
+    .review-section { margin-bottom: 20px; }
+    .review-section-title {
+      font-size: 10px; font-weight: 700; color: var(--deep-blue);
+      letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .review-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #E8E8F4; border-radius: 10px; overflow: hidden; }
+    .review-table td { padding: 9px 14px; font-size: 13px; border-bottom: 1px solid #F0F0F8; vertical-align: top; }
+    .review-table tr:last-child td { border-bottom: none; }
+    .review-table td:first-child { color: var(--mid-gray); font-weight: 600; width: 45%; }
+    .review-table td.missing { color: var(--red); font-weight: 600; }
+
+    /* ── Navigation row ── */
+    .nav-row { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 24px; }
+
+    /* ── Back button (matches offer-letter preview btn) ── */
+    .btn-back {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px; font-weight: 600;
+      color: var(--deep-blue); background: transparent;
+      border: 2px solid var(--deep-blue); border-radius: 8px;
+      padding: 11px 24px; cursor: pointer;
+      transition: background .18s, color .18s;
+      display: flex; align-items: center; gap: 8px; white-space: nowrap;
+    }
+    .btn-back:hover { background: var(--deep-blue); color: #fff; }
+    .btn-back:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Next button (matches offer-letter generate btn) ── */
+    .btn-next {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #fff; background: var(--deep-blue);
+      border: none; border-radius: 8px;
+      padding: 12px 32px; cursor: pointer;
+      transition: background .18s, transform .12s;
+    }
+    .btn-next:hover:not(:disabled) { background: var(--mid-blue); }
+    .btn-next:active { transform: scale(.99); }
+    .btn-next:disabled { background: var(--periwinkle); cursor: not-allowed; transform: none; }
+
+    /* ── Generate PDF button ── */
+    .btn-generate {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #fff; background: var(--deep-blue);
+      border: none; border-radius: 8px;
+      padding: 14px; cursor: pointer; width: 100%;
+      margin-top: 6px; letter-spacing: 0.3px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background .18s, transform .12s;
+    }
+    .btn-generate:hover:not(:disabled) { background: var(--mid-blue); }
+    .btn-generate:active { transform: scale(.99); }
+    .btn-generate:disabled { background: var(--periwinkle); cursor: not-allowed; transform: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite; display: none;
+    }
+    .btn-generate.loading .spinner { display: block; }
+    .btn-generate.loading .btn-text { opacity: .7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Validation error list ── */
+    .val-errors { list-style: none; text-align: right; }
+    .val-errors li { font-size: 12px; color: var(--red); margin-bottom: 2px; }
+
+    /* ── Missing banner ── */
+    .missing-banner {
+      background: #FFF0F0; border: 1px solid #FFAAAA; border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; color: #7A1111; margin-bottom: 16px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--dark-navy); color: #fff;
+      font-size: 14px; font-weight: 500;
+      padding: 12px 24px; border-radius: 8px;
+      opacity: 0; transition: transform .3s ease, opacity .3s ease;
+      z-index: 999; white-space: nowrap; pointer-events: none;
+    }
+    .toast.show  { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { background: var(--red); }
+
+    /* ── Responsive ── */
+    @media (max-width: 620px) {
+      .card { padding: 24px 18px; }
+      .nav-row { flex-direction: column-reverse; gap: 12px; }
+      .btn-back, .btn-next { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="serverBanner" class="server-banner" hidden></div>
+
+<header class="header">
+  <img src="assets/mellone_logo.png" alt="Mellone" class="header-logo" onerror="this.style.display='none'" />
+  <div>
+    <div class="header-title">Mentor Agreement Generator</div>
+    <div class="header-subtitle">Mellone · Newlogix Technologies Pvt Ltd · Internal HR Tool</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="steps" id="stepIndicator"></div>
+
+  <div class="card">
+
+    <!-- Step 1: Residency -->
+    <div class="step-panel" id="panel-1">
+      <div class="card-title">Step 1 — Residency Gate</div>
+      <div class="card-desc">The mentor's tax residency determines the tax clauses, currency, and jurisdiction in the agreement.</div>
+
+      <div class="section-label">Tax Residency</div>
+      <div class="field">
+        <label>Is the mentor a tax resident of India? <span class="req">*</span></label>
+        <div class="radio-cards">
+          <div class="radio-card" id="card-yes" onclick="pickResidency('yes')">
+            <label>
+              <input type="radio" name="is_india_resident" id="res_yes" value="yes" onchange="pickResidency('yes')">
+              Yes — the mentor is a tax resident of India
+            </label>
+            <p>PAN required · Currency set to INR · TDS applicable · Bangalore exclusive jurisdiction</p>
+          </div>
+          <div class="radio-card" id="card-no" onclick="pickResidency('no')">
+            <label>
+              <input type="radio" name="is_india_resident" id="res_no" value="no" onchange="pickResidency('no')">
+              No — the mentor is not a tax resident of India
+            </label>
+            <p>Foreign tax ID · Choose currency · Self-responsible for local taxes · Non-exclusive jurisdiction</p>
+          </div>
+        </div>
+        <div class="errmsg" id="err-residency">Please select a residency option.</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Personal Details -->
+    <div class="step-panel" id="panel-2">
+      <div class="card-title">Step 2 — Personal Details</div>
+      <div class="card-desc">Enter the mentor's legal details as they should appear in the agreement.</div>
+
+      <div class="section-label">Mentor Details</div>
+      <div class="field">
+        <label for="mentor_name">Full Name <span class="req">*</span></label>
+        <input type="text" id="mentor_name" placeholder="e.g. Priya Sharma" autocomplete="off" />
+        <div class="hint">Minimum two words — legal full name</div>
+        <div class="errmsg" id="err-mentor_name">Full name must contain at least two words.</div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="mentor_country">Country of Residence <span class="req">*</span></label>
+          <input type="text" id="mentor_country" placeholder="e.g. India" autocomplete="off" />
+          <div class="errmsg" id="err-mentor_country">Country of residence is required.</div>
+        </div>
+        <div class="field">
+          <label for="execution_date">Agreement Execution Date <span class="req">*</span></label>
+          <input type="date" id="execution_date" />
+          <div class="errmsg" id="err-execution_date">Execution date is required.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="mentor_address">Address <span class="req">*</span></label>
+        <textarea id="mentor_address" rows="3" placeholder="Street, City, State, PIN / Postal Code, Country"></textarea>
+        <div class="errmsg" id="err-mentor_address">Address is required.</div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="mentor_email">Email Address <span class="req">*</span></label>
+          <input type="email" id="mentor_email" placeholder="mentor@example.com" autocomplete="off" />
+          <div class="errmsg" id="err-mentor_email">Valid email is required.</div>
+        </div>
+        <div class="field">
+          <label for="mentor_business">Expertise / Business Description <span class="req">*</span></label>
+          <input type="text" id="mentor_business" placeholder="e.g. Generative AI and LLM deployment" autocomplete="off" />
+          <div class="errmsg" id="err-mentor_business">Expertise description is required.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Tax Details -->
+    <div class="step-panel" id="panel-3">
+      <div class="card-title">Step 3 — Tax Details</div>
+      <div class="card-desc" id="tax-desc">Enter the mentor's tax identification details.</div>
+
+      <div class="section-label">Tax Identification</div>
+
+      <!-- Indian -->
+      <div id="tax-india">
+        <div class="info-banner">Indian mentor — PAN is required. GSTIN is optional.</div>
+        <div class="field">
+          <label for="pan">PAN <span class="req">*</span></label>
+          <input type="text" id="pan" placeholder="ABCDE1234F" maxlength="10" oninput="this.value=this.value.toUpperCase()" />
+          <div class="hint">Format: 5 letters · 4 digits · 1 letter (AAAAA9999A)</div>
+          <div class="errmsg" id="err-pan">PAN must follow format AAAAA9999A.</div>
+        </div>
+      </div>
+
+      <!-- Non-Indian -->
+      <div id="tax-intl" style="display:none">
+        <div class="info-banner" id="tax-intl-banner">Non-Indian mentor — select the appropriate tax ID type.</div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="tax_id_type">Tax ID Type <span class="req">*</span></label>
+            <select id="tax_id_type">
+              <option value="">— Select —</option>
+              <option>VAT Number</option>
+              <option>TFN</option>
+              <option>EIN</option>
+              <option>NI Number</option>
+              <option>Other</option>
+            </select>
+            <div class="errmsg" id="err-tax_id_type">Tax ID type is required.</div>
+          </div>
+          <div class="field">
+            <label for="tax_id_intl">Tax ID Number <span class="req">*</span></label>
+            <input type="text" id="tax_id_intl" placeholder="Enter tax ID number" />
+            <div class="errmsg" id="err-tax_id_intl">Tax ID number is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:4px">Entity</div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="entity_type">Entity Type <span class="req">*</span></label>
+          <select id="entity_type" onchange="toggleEntityName()">
+            <option value="">— Select —</option>
+            <option>Individual</option>
+            <option>Registered Entity</option>
+          </select>
+          <div class="errmsg" id="err-entity_type">Entity type is required.</div>
+        </div>
+        <div class="field" id="entity-name-field" style="display:none">
+          <label for="entity_name">Registered Entity Name <span class="req">*</span></label>
+          <input type="text" id="entity_name" placeholder="e.g. Priya Sharma Consulting LLP" />
+          <div class="errmsg" id="err-entity_name">Entity name is required.</div>
+        </div>
+      </div>
+
+      <!-- GSTIN (Indian only) -->
+      <div id="gstin-section">
+        <div class="section-label" style="margin-top:4px">GST (Optional)</div>
+        <div class="field">
+          <label for="gstin">GSTIN <span style="color:var(--mid-gray);font-weight:400;font-size:12px">(optional)</span></label>
+          <input type="text" id="gstin" placeholder="22AAAAA0000A1Z5" maxlength="15"
+                 oninput="this.value=this.value.toUpperCase(); toggleGstType()" />
+          <div class="hint">Only if the mentor is GST-registered</div>
+          <div class="errmsg" id="err-gstin">GSTIN format is invalid.</div>
+        </div>
+        <div class="field" id="gst-type-field" style="display:none">
+          <label>Are the quoted fees inclusive or exclusive of GST? <span class="req">*</span></label>
+          <div class="radio-row">
+            <label><input type="radio" name="gst_type" value="exclusive" checked> Exclusive of GST</label>
+            <label><input type="radio" name="gst_type" value="inclusive"> Inclusive of GST</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Commercial Terms -->
+    <div class="step-panel" id="panel-4">
+      <div class="card-title">Step 4 — Commercial Terms</div>
+      <div class="card-desc">Set the fee rates and payment terms for this agreement.</div>
+
+      <!-- Currency (non-Indian only) -->
+      <div id="currency-section">
+        <div class="section-label">Currency</div>
+        <div class="field">
+          <label for="fee_currency">Fee Currency <span class="req">*</span></label>
+          <select id="fee_currency" onchange="toggleCustomCurrency()">
+            <option value="">— Select currency —</option>
+            <option>USD</option><option>GBP</option><option>EUR</option>
+            <option>AED</option><option>SGD</option><option>AUD</option>
+            <option>Other</option>
+          </select>
+          <div class="errmsg" id="err-fee_currency">Currency is required.</div>
+        </div>
+        <div class="field" id="custom-currency-field" style="display:none">
+          <label for="fee_currency_custom">Specify Currency Code <span class="req">*</span></label>
+          <input type="text" id="fee_currency_custom" placeholder="e.g. MUR" maxlength="10"
+                 oninput="this.value=this.value.toUpperCase()" />
+          <div class="errmsg" id="err-fee_currency_custom">Currency code is required.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Fee Rates</div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="fee_recorded">Fee per Recorded Hour <span class="req">*</span></label>
+          <input type="number" id="fee_recorded" placeholder="0.00" min="0" step="0.01"
+                 oninput="updateFeeSummary()" />
+          <div class="errmsg" id="err-fee_recorded">Must be a positive number.</div>
+        </div>
+        <div class="field">
+          <label for="fee_live">Fee per Live Session <span class="req">*</span></label>
+          <input type="number" id="fee_live" placeholder="0.00" min="0" step="0.01"
+                 oninput="updateFeeSummary()" />
+          <div class="errmsg" id="err-fee_live">Must be a positive number.</div>
+        </div>
+        <div class="field">
+          <label for="fee_content">Fee per Content Creation Hour <span class="req">*</span></label>
+          <input type="number" id="fee_content" placeholder="0.00" min="0" step="0.01"
+                 oninput="updateFeeSummary()" />
+          <div class="errmsg" id="err-fee_content">Must be a positive number.</div>
+        </div>
+        <div class="field">
+          <label for="invoice_days">Invoice Processing Days <span class="req">*</span></label>
+          <input type="number" id="invoice_days" value="30" min="1" step="1" />
+          <div class="hint">Days from receipt of valid invoice (default: 30)</div>
+          <div class="errmsg" id="err-invoice_days">Must be a positive integer.</div>
+        </div>
+      </div>
+
+      <div class="fee-summary" id="fee-summary" style="display:none">
+        <div class="fee-summary-title">Fee Summary</div>
+        <div class="fee-row"><span class="fee-label">Recorded content (per hour)</span><span class="fee-val" id="sum-recorded">—</span></div>
+        <div class="fee-row"><span class="fee-label">Live session (per session)</span><span class="fee-val" id="sum-live">—</span></div>
+        <div class="fee-row"><span class="fee-label">Content creation (per hour)</span><span class="fee-val" id="sum-content">—</span></div>
+      </div>
+    </div>
+
+    <!-- Step 5: Company Signatory -->
+    <div class="step-panel" id="panel-5">
+      <div class="card-title">Step 5 — Company Signatory</div>
+      <div class="card-desc">These details appear on the signature block on behalf of Mellone Private Limited.</div>
+
+      <div class="section-label">Signing Entity</div>
+      <div class="info-banner">
+        <strong>Mellone Private Limited</strong> · Bengaluru, Karnataka, India
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="sig_name">Signatory Full Name <span class="req">*</span></label>
+          <input type="text" id="sig_name" value="Rakesh Venugopal" autocomplete="off" oninput="updateSigPreview()" />
+          <div class="errmsg" id="err-sig_name">Signatory name is required.</div>
+        </div>
+        <div class="field">
+          <label for="sig_designation">Designation <span class="req">*</span></label>
+          <input type="text" id="sig_designation" value="Co-founder &amp; CEO" autocomplete="off" oninput="updateSigPreview()" />
+          <div class="errmsg" id="err-sig_designation">Designation is required.</div>
+        </div>
+      </div>
+
+      <div class="sig-preview" id="sig-preview">
+        <div class="sig-name" id="prev-name">Rakesh Venugopal</div>
+        <div class="sig-role" id="prev-role">Co-founder &amp; CEO</div>
+        <div class="sig-co">Mellone Private Limited</div>
+      </div>
+    </div>
+
+    <!-- Step 6: Review & Generate -->
+    <div class="step-panel" id="panel-6">
+      <div class="card-title">Step 6 — Review &amp; Generate</div>
+      <div class="card-desc">Review all details before generating. Fields marked ⚠ need to be corrected.</div>
+
+      <div id="missing-banner" class="missing-banner" style="display:none">
+        Some required fields are missing. Go back and correct them before generating.
+      </div>
+
+      <div id="review-content"></div>
+
+      <button class="btn-generate" id="generateBtn" onclick="doGenerate()" disabled>
+        <div class="spinner"></div>
+        <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-text">Generate &amp; Download PDF</span>
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--mid-gray);margin-top:10px">
+        The PDF will download automatically. Open in any PDF viewer.
+      </p>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- Navigation -->
+  <div class="nav-row">
+    <button class="btn-back" id="backBtn" onclick="goBack()" disabled>← Back</button>
+    <div id="next-area" style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <ul class="val-errors" id="val-errors"></ul>
+      <button class="btn-next" id="nextBtn" onclick="goNext()">Next →</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const TODAY = new Date().toISOString().split('T')[0];
+let currentStep = 1;
+const TOTAL = 6;
+
+document.getElementById('execution_date').value = TODAY;
+document.getElementById('execution_date').min   = TODAY;
+
+// ─── Server banner ────────────────────────────────────────────────────────────
+if (window.location.protocol === 'file:') {
+  const b = document.getElementById('serverBanner');
+  b.hidden = false;
+  b.innerHTML = '<strong>Wrong URL.</strong> Open via the server. Run <code>node server/index.js</code> then visit <a href="http://localhost:3001">http://localhost:3001</a>.';
+} else {
+  fetch('/health').then(r => { if (r.ok) document.getElementById('serverBanner').hidden = true; }).catch(() => {
+    const b = document.getElementById('serverBanner');
+    b.hidden = false;
+    b.textContent = 'Server not running — run node server/index.js then refresh.';
+  });
+}
+
+// ─── Step names ───────────────────────────────────────────────────────────────
+const STEP_NAMES = ['Residency', 'Personal Details', 'Tax Details', 'Commercial Terms', 'Signatory', 'Review & Generate'];
+
+// ─── Render step indicator ────────────────────────────────────────────────────
+function renderSteps() {
+  const el = document.getElementById('stepIndicator');
+  let html = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const cls      = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
+    const labelCls = i === currentStep ? 'active' : '';
+    html += `<div class="step-item">
+      <div class="step-wrap">
+        <div class="step-circle ${cls}">${i < currentStep ? '✓' : i}</div>
+        <div class="step-label ${labelCls}">${STEP_NAMES[i-1]}</div>
+      </div>`;
+    if (i < TOTAL) html += `<div class="step-connector ${i < currentStep ? 'done' : ''}"></div>`;
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ─── Show/hide panels ─────────────────────────────────────────────────────────
+function showPanel(n) {
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('panel-' + i).classList.toggle('visible', i === n);
+  }
+  document.getElementById('backBtn').disabled = (n === 1);
+  const nextArea = document.getElementById('next-area');
+  nextArea.style.display = (n === TOTAL) ? 'none' : 'flex';
+  if (n === TOTAL) buildReview();
+  renderSteps();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Residency ────────────────────────────────────────────────────────────────
+function pickResidency(val) {
+  document.getElementById('res_yes').checked = (val === 'yes');
+  document.getElementById('res_no').checked  = (val === 'no');
+  document.getElementById('card-yes').classList.toggle('selected', val === 'yes');
+  document.getElementById('card-no').classList.toggle('selected',  val === 'no');
+  if (val === 'yes') {
+    document.getElementById('mentor_country').value    = 'India';
+    document.getElementById('mentor_country').disabled = true;
+  } else {
+    if (document.getElementById('mentor_country').value === 'India') {
+      document.getElementById('mentor_country').value = '';
+    }
+    document.getElementById('mentor_country').disabled = false;
+  }
+}
+
+// ─── Tax panel toggle ─────────────────────────────────────────────────────────
+function setupTaxPanel() {
+  const isIndian = document.getElementById('res_yes').checked;
+  document.getElementById('tax-india').style.display   = isIndian ? '' : 'none';
+  document.getElementById('tax-intl').style.display    = isIndian ? 'none' : '';
+  document.getElementById('gstin-section').style.display = isIndian ? '' : 'none';
+  if (!isIndian) {
+    const country = document.getElementById('mentor_country').value || "the mentor's country";
+    document.getElementById('tax-intl-banner').textContent =
+      `Non-Indian mentor — select the appropriate tax ID type for ${country}.`;
+  }
+}
+
+function toggleEntityName() {
+  const show = document.getElementById('entity_type').value === 'Registered Entity';
+  document.getElementById('entity-name-field').style.display = show ? '' : 'none';
+}
+
+function toggleGstType() {
+  const val = document.getElementById('gstin').value;
+  document.getElementById('gst-type-field').style.display = val ? '' : 'none';
+}
+
+// ─── Currency ─────────────────────────────────────────────────────────────────
+function setupCurrencyPanel() {
+  const isIndian = document.getElementById('res_yes').checked;
+  document.getElementById('currency-section').style.display = isIndian ? 'none' : '';
+}
+
+function toggleCustomCurrency() {
+  const val = document.getElementById('fee_currency').value;
+  document.getElementById('custom-currency-field').style.display = (val === 'Other') ? '' : 'none';
+}
+
+function getCurrency() {
+  const isIndian = document.getElementById('res_yes').checked;
+  if (isIndian) return 'INR';
+  const sel = document.getElementById('fee_currency').value;
+  if (sel === 'Other') return document.getElementById('fee_currency_custom').value || 'Other';
+  return sel || '—';
+}
+
+// ─── Fee summary ──────────────────────────────────────────────────────────────
+function updateFeeSummary() {
+  const c  = getCurrency();
+  const r  = parseFloat(document.getElementById('fee_recorded').value) || 0;
+  const l  = parseFloat(document.getElementById('fee_live').value) || 0;
+  const co = parseFloat(document.getElementById('fee_content').value) || 0;
+  const show = r > 0 || l > 0 || co > 0;
+  document.getElementById('fee-summary').style.display = show ? '' : 'none';
+  document.getElementById('sum-recorded').textContent = `${c} ${r.toFixed(2)}`;
+  document.getElementById('sum-live').textContent     = `${c} ${l.toFixed(2)}`;
+  document.getElementById('sum-content').textContent  = `${c} ${co.toFixed(2)}`;
+}
+
+// ─── Signatory preview ────────────────────────────────────────────────────────
+function updateSigPreview() {
+  document.getElementById('prev-name').textContent = document.getElementById('sig_name').value || '—';
+  document.getElementById('prev-role').textContent = document.getElementById('sig_designation').value || '—';
+}
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+function clearErr(id) {
+  const el  = document.getElementById(id);
+  const msg = document.getElementById('err-' + id);
+  if (el)  el.classList.remove('err');
+  if (msg) msg.classList.remove('show');
+}
+
+function showErr(id, fieldId) {
+  if (fieldId) { const el = document.getElementById(fieldId); if (el) el.classList.add('err'); }
+  const msg = document.getElementById('err-' + id);
+  if (msg) msg.classList.add('show');
+}
+
+function validateStep(n) {
+  const errs = [];
+
+  if (n === 1) {
+    const res = document.querySelector('input[name="is_india_resident"]:checked');
+    if (!res) { showErr('residency'); errs.push('Please select a residency option.'); }
+    else clearErr('residency');
+  }
+
+  if (n === 2) {
+    const name = document.getElementById('mentor_name').value.trim();
+    if (!name || name.split(/\s+/).length < 2) { showErr('mentor_name', 'mentor_name'); errs.push('Full name must contain at least two words.'); }
+    else clearErr('mentor_name');
+
+    const country = document.getElementById('mentor_country').value.trim();
+    if (!country) { showErr('mentor_country', 'mentor_country'); errs.push('Country of residence is required.'); }
+    else clearErr('mentor_country');
+
+    const addr = document.getElementById('mentor_address').value.trim();
+    if (!addr) { showErr('mentor_address', 'mentor_address'); errs.push('Address is required.'); }
+    else clearErr('mentor_address');
+
+    const email = document.getElementById('mentor_email').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('mentor_email', 'mentor_email'); errs.push('Valid email is required.'); }
+    else clearErr('mentor_email');
+
+    const biz = document.getElementById('mentor_business').value.trim();
+    if (!biz) { showErr('mentor_business', 'mentor_business'); errs.push('Expertise description is required.'); }
+    else clearErr('mentor_business');
+
+    const date = document.getElementById('execution_date').value;
+    if (!date) { showErr('execution_date', 'execution_date'); errs.push('Execution date is required.'); }
+    else clearErr('execution_date');
+  }
+
+  if (n === 3) {
+    const isIndian = document.getElementById('res_yes').checked;
+    if (isIndian) {
+      const pan = document.getElementById('pan').value.trim();
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) { showErr('pan', 'pan'); errs.push('PAN must follow format AAAAA9999A.'); }
+      else clearErr('pan');
+
+      const gstin = document.getElementById('gstin').value.trim();
+      if (gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstin)) {
+        showErr('gstin', 'gstin'); errs.push('GSTIN format is invalid.');
+      } else clearErr('gstin');
+    } else {
+      const type = document.getElementById('tax_id_type').value;
+      if (!type) { showErr('tax_id_type', 'tax_id_type'); errs.push('Tax ID type is required.'); }
+      else clearErr('tax_id_type');
+
+      const id = document.getElementById('tax_id_intl').value.trim();
+      if (!id) { showErr('tax_id_intl', 'tax_id_intl'); errs.push('Tax ID number is required.'); }
+      else clearErr('tax_id_intl');
+    }
+
+    const etype = document.getElementById('entity_type').value;
+    if (!etype) { showErr('entity_type', 'entity_type'); errs.push('Entity type is required.'); }
+    else clearErr('entity_type');
+
+    if (etype === 'Registered Entity') {
+      const ename = document.getElementById('entity_name').value.trim();
+      if (!ename) { showErr('entity_name', 'entity_name'); errs.push('Entity name is required.'); }
+      else clearErr('entity_name');
+    }
+  }
+
+  if (n === 4) {
+    const isIndian = document.getElementById('res_yes').checked;
+    if (!isIndian) {
+      const cur = document.getElementById('fee_currency').value;
+      if (!cur) { showErr('fee_currency', 'fee_currency'); errs.push('Currency is required.'); }
+      else clearErr('fee_currency');
+      if (cur === 'Other') {
+        const custom = document.getElementById('fee_currency_custom').value.trim();
+        if (!custom) { showErr('fee_currency_custom', 'fee_currency_custom'); errs.push('Please specify the currency.'); }
+        else clearErr('fee_currency_custom');
+      }
+    }
+
+    const fr = parseFloat(document.getElementById('fee_recorded').value);
+    if (!fr || fr <= 0) { showErr('fee_recorded', 'fee_recorded'); errs.push('Fee per recorded hour must be a positive number.'); }
+    else clearErr('fee_recorded');
+
+    const fl = parseFloat(document.getElementById('fee_live').value);
+    if (!fl || fl <= 0) { showErr('fee_live', 'fee_live'); errs.push('Fee per live session must be a positive number.'); }
+    else clearErr('fee_live');
+
+    const fc = parseFloat(document.getElementById('fee_content').value);
+    if (!fc || fc <= 0) { showErr('fee_content', 'fee_content'); errs.push('Fee per content creation hour must be a positive number.'); }
+    else clearErr('fee_content');
+
+    const id = parseInt(document.getElementById('invoice_days').value);
+    if (!id || id <= 0) { showErr('invoice_days', 'invoice_days'); errs.push('Invoice processing days must be a positive integer.'); }
+    else clearErr('invoice_days');
+  }
+
+  if (n === 5) {
+    const name = document.getElementById('sig_name').value.trim();
+    if (!name) { showErr('sig_name', 'sig_name'); errs.push('Signatory name is required.'); }
+    else clearErr('sig_name');
+
+    const desig = document.getElementById('sig_designation').value.trim();
+    if (!desig) { showErr('sig_designation', 'sig_designation'); errs.push('Designation is required.'); }
+    else clearErr('sig_designation');
+  }
+
+  document.getElementById('val-errors').innerHTML = errs.map(e => `<li>${e}</li>`).join('');
+  return errs.length === 0;
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function goNext() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep < TOTAL) {
+    currentStep++;
+    if (currentStep === 3) setupTaxPanel();
+    if (currentStep === 4) { setupCurrencyPanel(); updateFeeSummary(); }
+    showPanel(currentStep);
+  }
+}
+
+function goBack() {
+  if (currentStep > 1) {
+    currentStep--;
+    document.getElementById('val-errors').innerHTML = '';
+    showPanel(currentStep);
+  }
+}
+
+// ─── Build review ─────────────────────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+}
+
+function reviewRow(label, value, missing) {
+  return `<tr><td>${label}</td><td class="${missing ? 'missing' : ''}">${missing ? '⚠ Not provided' : (value || '—')}</td></tr>`;
+}
+
+function reviewSection(title, rows) {
+  return `<div class="review-section">
+    <div class="review-section-title">${title}</div>
+    <table class="review-table"><tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+function buildReview() {
+  const isIndian   = document.getElementById('res_yes').checked;
+  const currency   = getCurrency();
+  const gstin      = document.getElementById('gstin').value.trim();
+  const gstType    = document.querySelector('input[name="gst_type"]:checked')?.value || '';
+  const entityType = document.getElementById('entity_type').value;
+
+  let html = '', allOk = true;
+  function m(v) { const miss = !v || v === '—'; if (miss) allOk = false; return miss; }
+
+  html += reviewSection('Residency', [
+    reviewRow('India Resident', isIndian ? 'Yes — India' : 'No — International', !document.querySelector('input[name="is_india_resident"]:checked')),
+  ].join(''));
+
+  const name    = document.getElementById('mentor_name').value.trim();
+  const country = document.getElementById('mentor_country').value.trim();
+  const addr    = document.getElementById('mentor_address').value.trim();
+  const email   = document.getElementById('mentor_email').value.trim();
+  const biz     = document.getElementById('mentor_business').value.trim();
+  const date    = document.getElementById('execution_date').value;
+
+  html += reviewSection('Personal Details', [
+    reviewRow('Full Name',       name,         m(name)),
+    reviewRow('Country',         country,      m(country)),
+    reviewRow('Address',         addr,         m(addr)),
+    reviewRow('Email',           email,        m(email)),
+    reviewRow('Expertise',       biz,          m(biz)),
+    reviewRow('Execution Date',  fmtDate(date), m(date)),
+  ].join(''));
+
+  let taxRows = '';
+  if (isIndian) {
+    const pan = document.getElementById('pan').value.trim();
+    taxRows += reviewRow('PAN', pan, m(pan));
+    taxRows += reviewRow('Entity Type', entityType, m(entityType));
+    if (entityType === 'Registered Entity') {
+      const en = document.getElementById('entity_name').value.trim();
+      taxRows += reviewRow('Entity Name', en, m(en));
+    }
+    taxRows += reviewRow('GSTIN', gstin || 'Not provided', false);
+    if (gstin) taxRows += reviewRow('GST Treatment', `${gstType} of GST`, m(gstType));
+  } else {
+    const ttype = document.getElementById('tax_id_type').value;
+    const tid   = document.getElementById('tax_id_intl').value.trim();
+    taxRows += reviewRow('Tax ID Type', ttype, m(ttype));
+    taxRows += reviewRow('Tax ID',      tid,   m(tid));
+    taxRows += reviewRow('Entity Type', entityType, m(entityType));
+    if (entityType === 'Registered Entity') {
+      const en = document.getElementById('entity_name').value.trim();
+      taxRows += reviewRow('Entity Name', en, m(en));
+    }
+  }
+  html += reviewSection('Tax Details', taxRows);
+
+  const fr = document.getElementById('fee_recorded').value;
+  const fl = document.getElementById('fee_live').value;
+  const fc = document.getElementById('fee_content').value;
+  const id = document.getElementById('invoice_days').value;
+  html += reviewSection('Commercial Terms', [
+    reviewRow('Currency',                    currency,                                        m(currency === '—' ? '' : currency)),
+    reviewRow('Fee — Recorded Hour',         `${currency} ${parseFloat(fr||0).toFixed(2)}`,  m(fr)),
+    reviewRow('Fee — Live Session',          `${currency} ${parseFloat(fl||0).toFixed(2)}`,  m(fl)),
+    reviewRow('Fee — Content Creation Hour', `${currency} ${parseFloat(fc||0).toFixed(2)}`,  m(fc)),
+    reviewRow('Invoice Processing',          `${id} days`,                                   m(id)),
+  ].join(''));
+
+  const sn = document.getElementById('sig_name').value.trim();
+  const sd = document.getElementById('sig_designation').value.trim();
+  html += reviewSection('Company Signatory', [
+    reviewRow('Name',        sn, m(sn)),
+    reviewRow('Designation', sd, m(sd)),
+  ].join(''));
+
+  document.getElementById('review-content').innerHTML = html;
+  document.getElementById('missing-banner').style.display = allOk ? 'none' : '';
+  document.getElementById('generateBtn').disabled = !allOk;
+}
+
+// ─── Collect form data ────────────────────────────────────────────────────────
+function collectFormData() {
+  const isIndian  = document.getElementById('res_yes').checked;
+  const gstin     = document.getElementById('gstin').value.trim();
+  const cur       = isIndian ? 'INR' : document.getElementById('fee_currency').value;
+  const curCustom = cur === 'Other' ? document.getElementById('fee_currency_custom').value.trim() : '';
+
+  return {
+    is_india_resident:              isIndian ? 'yes' : 'no',
+    mentor_name:                    document.getElementById('mentor_name').value.trim(),
+    mentor_country_of_residence:    document.getElementById('mentor_country').value.trim(),
+    mentor_address:                 document.getElementById('mentor_address').value.trim(),
+    mentor_email:                   document.getElementById('mentor_email').value.trim(),
+    mentor_business_description:    document.getElementById('mentor_business').value.trim(),
+    execution_date:                 document.getElementById('execution_date').value,
+    mentor_tax_id_type:             isIndian ? 'PAN' : document.getElementById('tax_id_type').value,
+    mentor_tax_id:                  isIndian ? document.getElementById('pan').value.trim()
+                                             : document.getElementById('tax_id_intl').value.trim(),
+    mentor_entity_type:             document.getElementById('entity_type').value,
+    mentor_entity_name:             document.getElementById('entity_type').value === 'Registered Entity'
+                                      ? document.getElementById('entity_name').value.trim() : '',
+    mentor_gstin:                   isIndian ? gstin : '',
+    fees_inclusive_exclusive_gst:   gstin ? (document.querySelector('input[name="gst_type"]:checked')?.value || 'exclusive') : '',
+    fee_currency:                   cur,
+    fee_currency_custom:            curCustom,
+    fee_per_recorded_hour:          document.getElementById('fee_recorded').value,
+    fee_per_live_session:           document.getElementById('fee_live').value,
+    fee_per_content_creation_hour:  document.getElementById('fee_content').value,
+    invoice_processing_days:        parseInt(document.getElementById('invoice_days').value, 10),
+    company_signatory_name:         document.getElementById('sig_name').value.trim(),
+    company_signatory_designation:  document.getElementById('sig_designation').value.trim(),
+  };
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4500);
+}
+
+// ─── Generate PDF ─────────────────────────────────────────────────────────────
+async function doGenerate() {
+  const btn = document.getElementById('generateBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const formData = collectFormData();
+    const res = await fetch('/api/generate-msa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Server error (${res.status})`);
+    }
+
+    const blob = await res.blob();
+    const safe = formData.mentor_name.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ /g, '_');
+    const filename = `Mellone_MSA_${safe}_${formData.execution_date}.pdf`;
+
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    showToast('MSA generated and downloaded!');
+  } catch (err) {
+    const isNet = err.message.toLowerCase().includes('fetch') || err.message.toLowerCase().includes('failed');
+    showToast(isNet ? 'Cannot reach server. Is node server/index.js running?' : 'Error: ' + err.message, true);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+showPanel(1);
+</script>
+</body>
+</html>

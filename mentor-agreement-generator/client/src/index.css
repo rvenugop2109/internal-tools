@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --deep-blue:   #1A1AE6;
+  --mid-blue:    #3333CC;
+  --periwinkle:  #7B7BE8;
+  --pale-blue:   #A0A0F5;
+  --off-white:   #F4F4FB;
+  --dark-navy:   #1C1C2E;
+  --mid-gray:    #4A4A6A;
+}
+
+* {
+  font-family: 'Calibri', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--off-white);
+  color: var(--dark-navy);
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-deep text-white font-bold px-6 py-2.5 rounded-lg
+           hover:bg-brand-mid transition-colors duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply border border-brand-deep text-brand-deep font-semibold px-6 py-2.5 rounded-lg
+           hover:bg-brand-deep hover:text-white transition-colors duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .form-input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2.5 text-brand-navy
+           focus:outline-none focus:ring-2 focus:ring-brand-peri focus:border-transparent
+           placeholder:text-brand-gray/50 bg-white;
+  }
+
+  .form-input-error {
+    @apply border-red-400 focus:ring-red-300;
+  }
+
+  .form-label {
+    @apply block text-sm font-semibold text-brand-navy mb-1.5;
+  }
+
+  .form-error {
+    @apply text-xs text-red-500 mt-1;
+  }
+
+  .form-helper {
+    @apply text-xs text-brand-gray mt-1;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+  }
+
+  .section-title {
+    @apply text-lg font-bold text-brand-deep mb-4;
+  }
+}
