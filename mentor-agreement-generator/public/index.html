@@ -482,7 +482,7 @@
           <div class="errmsg" id="err-fee_recorded">Enter a positive number or N/A.</div>
         </div>
         <div class="field">
-          <label for="fee_live">Fee per Live Session <span class="req">*</span></label>
+          <label for="fee_live">Fee per Live Hour <span class="req">*</span></label>
           <input type="text" id="fee_live" placeholder="e.g. 8000 or N/A"
                  oninput="updateFeeSummary()" />
           <div class="errmsg" id="err-fee_live">Enter a positive number or N/A.</div>
@@ -504,7 +504,7 @@
       <div class="fee-summary" id="fee-summary" style="display:none">
         <div class="fee-summary-title">Fee Summary</div>
         <div class="fee-row"><span class="fee-label">Recorded content (per hour)</span><span class="fee-val" id="sum-recorded">—</span></div>
-        <div class="fee-row"><span class="fee-label">Live session (per session)</span><span class="fee-val" id="sum-live">—</span></div>
+        <div class="fee-row"><span class="fee-label">Live session (per hour)</span><span class="fee-val" id="sum-live">—</span></div>
         <div class="fee-row"><span class="fee-label">Content creation (per hour)</span><span class="fee-val" id="sum-content">—</span></div>
       </div>
     </div>
@@ -816,7 +816,7 @@ function validateStep(n) {
     else clearErr('fee_recorded');
 
     const fl = document.getElementById('fee_live').value;
-    if (!validFee(fl)) { showErr('fee_live', 'fee_live'); errs.push('Fee per live session: enter a number or N/A.'); }
+    if (!validFee(fl)) { showErr('fee_live', 'fee_live'); errs.push('Fee per live hour: enter a number or N/A.'); }
     else clearErr('fee_live');
 
     const fc = document.getElementById('fee_content').value;
@@ -941,7 +941,7 @@ function buildReview() {
   html += reviewSection('Commercial Terms', [
     reviewRow('Currency',                    currency,                                        m(currency === '—' ? '' : currency)),
     reviewRow('Fee — Recorded Hour',         feeDisplay(fr,  currency),  m(fr)),
-    reviewRow('Fee — Live Session',          feeDisplay(fl,  currency),  m(fl)),
+    reviewRow('Fee — Live Hour',             feeDisplay(fl,  currency),  m(fl)),
     reviewRow('Fee — Content Creation Hour', feeDisplay(fc,  currency),  m(fc)),
     reviewRow('Invoice Processing',          `${id} days`,                                   m(id)),
   ].join(''));

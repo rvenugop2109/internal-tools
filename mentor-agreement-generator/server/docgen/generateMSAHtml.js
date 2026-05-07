@@ -567,7 +567,7 @@ function generateMSAHtml(fd) {
     ['Service Category', `Rate (${currency})`, 'Unit'],
     [
       ['Recorded Content Creation', fmtFee(fd.fee_per_recorded_hour),         'Per recorded hour'],
-      ['Live Session Delivery',     fmtFee(fd.fee_per_live_session),           'Per session'],
+      ['Live Hour Delivery',        fmtFee(fd.fee_per_live_session),           'Per hour'],
       ['Content Creation / Review', fmtFee(fd.fee_per_content_creation_hour), 'Per hour'],
     ]
   )}
